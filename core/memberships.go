@@ -38,6 +38,23 @@ func getMembership(d *sql.DB, c *gin.Context) error {
 	return nil
 }
 
+func getCompanyMembership(d *sql.DB, c *gin.Context) error {
+    companyID := c.Param("CompanyID")
+    if companyID == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Specify company id"})
+        return nil
+    }
+
+    companyMembership, err := database.GetCompanyMembership(d, companyID)
+    if err != nil {
+        return err
+    }
+
+    c.JSON(http.StatusOK, gin.H{"company_membership": companyMembership})
+
+    return nil
+}
+
 // TODO: This will require we to implement authentication to check user permissions and user token.
 func createMembership(d *sql.DB, c *gin.Context) error {
 	bodyContents, err := io.ReadAll(c.Request.Body)
@@ -78,6 +95,7 @@ func removeMembership(d *sql.DB, c *gin.Context) error {
 func CreateMembershipsRoutes(d *sql.DB, r *gin.RouterGroup) {
 	r.GET("/", WrapError(WithDB(d, getMemberships)))
 	r.GET("/:MembershipID", WrapError(WithDB(d, getMembership)))
+	r.GET("/company-membership/:CompanyID", WrapError(WithDB(d, getCompanyMembership)))
 	r.POST("/", WrapError(WithDB(d, createMembership)))
 	r.DELETE("/:MembershipID", WrapError(WithDB(d, removeMembership)))
 }
