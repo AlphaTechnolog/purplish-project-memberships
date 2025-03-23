@@ -39,20 +39,20 @@ func getMembership(d *sql.DB, c *gin.Context) error {
 }
 
 func getCompanyMembership(d *sql.DB, c *gin.Context) error {
-    companyID := c.Param("CompanyID")
-    if companyID == "" {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Specify company id"})
-        return nil
-    }
+	companyID := c.Param("CompanyID")
+	if companyID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Specify company id"})
+		return nil
+	}
 
-    companyMembership, err := database.GetCompanyMembership(d, companyID)
-    if err != nil {
-        return err
-    }
+	companyMembership, err := database.GetCompanyMembership(d, companyID)
+	if err != nil {
+		return err
+	}
 
-    c.JSON(http.StatusOK, gin.H{"company_membership": companyMembership})
+	c.JSON(http.StatusOK, gin.H{"company_membership": companyMembership})
 
-    return nil
+	return nil
 }
 
 // TODO: This will require we to implement authentication to check user permissions and user token.
