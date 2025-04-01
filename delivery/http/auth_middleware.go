@@ -3,11 +3,18 @@ package http
 import (
 	"net/http"
 
+	"github.com/alphatechnolog/purplish-memberships/pkg/helpers"
 	"github.com/alphatechnolog/purplish-project-common/auth"
 	"github.com/gin-gonic/gin"
 )
 
-const API_GATEWAY_AUTH_TOKEN_B64 = "BTcZcmbaQDMkRt5gtdQ9c/c2mpEc1ZPehUm1KEOU7oE="
+func getAuthToken() string {
+	authToken := helpers.GetEnv("API_GATEWAY_AUTH_TOKEN_B64", "")
+	if authToken == "" {
+		panic("auth token is required to validate api gateway scopes")
+	}
+	return authToken
+}
 
 func APIGatewayScopeCheck(requiredScopes string) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -17,7 +24,8 @@ func APIGatewayScopeCheck(requiredScopes string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		userScopes, err := auth.ApiGatewayScopeCheck(API_GATEWAY_AUTH_TOKEN_B64, userScopes, requiredScopes)
+		authToken := getAuthToken()
+		userScopes, err := auth.ApiGatewayScopeCheck(authToken, userScopes, requiredScopes)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			c.Abort()
